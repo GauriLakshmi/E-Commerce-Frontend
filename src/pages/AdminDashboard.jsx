@@ -1,62 +1,125 @@
-import React, { useEffect, useState } from "react";
-import { getProducts, createProduct, deleteProduct } from "../services/productService";
+import { useEffect, useState } from "react";
+
 import ProductCard from "../components/ProductCard";
-import API from "../api/api";
 import CustomerCard from "../components/CustomerCard";
+import axios from "../api/api";
+import "../styles/dashboard.css";
+import "../styles/forms.css";
 
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
-  const [customers, setCustomers] = useState([]);
+  const [users, setUsers] = useState([]);
 
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    description: "",
+    price: "",
+    quantity: "",
+  });
+
+  const token = localStorage.getItem("token");
+
+  // Fetch products
   const fetchProducts = async () => {
-    const res = await getProducts();
-    setProducts(res.data);
+    try {
+      const res = await axios.get("/products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const fetchCustomers = async () => {
-    const res = await API.get("/auth/users"); // you'll need a route for getting all users
-    setCustomers(res.data);
-  };
-
-  const handleAddProduct = async () => {
-    const name = prompt("Product name");
-    const price = prompt("Price");
-    const description = prompt("Description");
-    const quantity = prompt("Quantity");
-    await createProduct({ name, price, description, quantity });
-    fetchProducts();
-  };
-
-  const handleDeleteProduct = async (id) => {
-    if (window.confirm("Delete this product?")) {
-      await deleteProduct(id);
-      fetchProducts();
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("/auth/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
   useEffect(() => {
     fetchProducts();
-    fetchCustomers();
+    fetchUsers();
   }, []);
 
-  return (
-    <div>
-      <h2>Admin Dashboard</h2>
-      <button onClick={handleAddProduct}>Add Product</button>
-      <h3>Products</h3>
-      <div className="product-list">
-        {products.map((p) => (
-          <ProductCard key={p._id} product={p} isAdmin={true} onDelete={handleDeleteProduct} />
-        ))}
-      </div>
+  // Handle form input change
+  const handleChange = (e) => {
+    setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+  };
 
-      <h3>Customers</h3>
-      <div className="customer-list">
-        {customers.map((c) => (
-          <CustomerCard key={c._id} customer={c} />
+  // Handle add product
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("/products", newProduct, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("Product added successfully!");
+      setNewProduct({ name: "", description: "", price: "", quantity: "" });
+      fetchProducts();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add product");
+    }
+  };
+
+  return (
+    <>
+
+      <div className="dashboard">
+        <h2>Add New Product</h2>
+        <form className="form-container" onSubmit={handleAddProduct}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={newProduct.name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            value={newProduct.description}
+            onChange={handleChange}
+          />
+          <input
+            type="number"
+            name="price"
+            placeholder="Price"
+            value={newProduct.price}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity"
+            value={newProduct.quantity}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit">Add Product</button>
+        </form>
+
+        <h2>Products</h2>
+        {products.map((product) => (
+          <ProductCard key={product._id} product={product} admin />
+        ))}
+
+        <h2>Customers</h2>
+        {users.map((user) => (
+          <CustomerCard key={user._id} user={user} />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

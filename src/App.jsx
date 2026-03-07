@@ -1,14 +1,17 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
+// Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const role = localStorage.getItem("role");
   return (
     <Router>
       <Navbar />
@@ -16,15 +19,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              {role === "admin" ? <AdminDashboard /> : <UserDashboard />}
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

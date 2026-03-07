@@ -1,32 +1,32 @@
 import { useEffect, useState } from "react";
-import axios from "../services/authService";
+
+import axios from "../api/api";
+import "../styles/forms.css";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("/profile", {
+        const res = await axios.get("/auth/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(res.data.user);
+        setUser(res.data);
       } catch (err) {
-        alert("Error fetching profile");
+        console.error(err);
       }
     };
     fetchProfile();
-  }, []);
-
-  if (!user) return <p>Loading...</p>;
+  }, [token]);
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Profile</h2>
-      <p>Name: {user.name}</p>
-      <p>Email: {user.email}</p>
-      <p>Role: {user.role}</p>
+      <p><strong>Name:</strong> {user.name}</p>
+      <p><strong>Email:</strong> {user.email}</p>
+      <p><strong>Role:</strong> {user.role}</p>
     </div>
   );
 };

@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { getProducts } from "../services/productService";
+// src/pages/UserDashboard.jsx
+import { useEffect, useState } from "react";
+
 import ProductCard from "../components/ProductCard";
+import axios from "../api/api";
+import "../styles/dashboard.css";
 
 const UserDashboard = () => {
   const [products, setProducts] = useState([]);
+  const token = localStorage.getItem("token");
 
   const fetchProducts = async () => {
-    const res = await getProducts();
-    setProducts(res.data);
+    try {
+      const res = await axios.get("/products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -15,14 +25,15 @@ const UserDashboard = () => {
   }, []);
 
   return (
-    <div>
-      <h2>User Dashboard</h2>
-      <div className="product-list">
-        {products.map((p) => (
-          <ProductCard key={p._id} product={p} isAdmin={false} />
+    <>
+      
+      <div className="dashboard">
+        <h2>Available Products</h2>
+        {products.map((product) => (
+          <ProductCard key={product._id} product={product} />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

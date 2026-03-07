@@ -1,11 +1,14 @@
-import React from "react";
+// src/components/CustomerCard.jsx
+import "../styles/card.css";
 
-const CustomerCard = ({ customer }) => (
-  <div className="customer-card">
-    <h3>{customer.name}</h3>
-    <p>Email: {customer.email}</p>
-    <p>Role: {customer.role}</p>
-  </div>
-);
+const CustomerCard = ({ user }) => {
+  return (
+    <div className="card">
+      <h3>{user.name}</h3>
+      <p>Email: {user.email}</p>
+      <p>Role: {user.role}</p>
+    </div>
+  );
+};
 
 export default CustomerCard;
