@@ -20,7 +20,7 @@ const ProductCard = ({ product, admin }) => {
   return (
     <div className="card">
       <img
-        src="/src/assets/product-placeholder.png"
+        src="/src/assets/product-placeholder.jpg"
         alt={product.name}
       />
       <h3>{product.name}</h3>

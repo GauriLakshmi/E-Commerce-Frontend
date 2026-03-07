@@ -1,26 +1,30 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../services/authService";
+import authService from "../services/authService"; // default import
 import "../styles/forms.css";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      alert("Login successful!");
-      navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
-    } catch (err) {
-      alert("Invalid credentials");
-      console.error(err);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const data = await authService.login({ email, password });
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.role);
+
+    // Redirect based on role
+    if (data.role === "admin") {
+      navigate("/admin"); // admin goes to /admin
+    } else {
+      navigate("/dashboard"); // regular user goes to /dashboard
     }
-  };
+  } catch (err) {
+    alert(err.response?.data?.message || "Login failed");
+  }
+};
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>

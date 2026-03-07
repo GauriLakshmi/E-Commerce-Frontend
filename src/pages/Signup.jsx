@@ -1,24 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../services/authService";
+import authService from "../services/authService"; // default import
 import "../styles/forms.css";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/auth/signup", { name, email, password, role });
-      alert("Signup successful! Please login.");
+      await authService.signup({ name, email, password });
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      alert("Signup failed!");
+      alert(err.response?.data?.message || "Signup failed");
     }
   };
 

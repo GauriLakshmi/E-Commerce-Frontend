@@ -1,7 +1,19 @@
-import axios from "axios";
+// src/services/authService.js
+import API from "../api/api";
 
-const instance = axios.create({
-  baseURL: "http://localhost:5000/api/auth",
-});
+const authService = {
+  signup: async (userData) => {
+    const res = await API.post("/auth/signup", userData);
+    return res.data;
+  },
+  login: async (userData) => {
+    const res = await API.post("/auth/login", userData);
+    return res.data;
+  },
+  getProfile: async () => {
+    const res = await API.get("/auth/profile");
+    return res.data;
+  },
+};
 
-export default instance;
+export default authService; // default export
